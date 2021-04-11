@@ -16,15 +16,15 @@ export default class AnnotateController implements Disposable {
   }
 
   toggle(): void {
-    const editor = window.activeTextEditor;
-    if (!editor) {
+    const document = window.activeTextEditor?.document;
+    if (!document) {
       return;
     }
-    const annotator = this.documentMap.get(editor.document);
+    const annotator = this.documentMap.get(document);
     if (annotator) {
       annotator.toggle();
     } else {
-      this.documentMap.set(editor.document, new Annotator(editor));
+      this.documentMap.set(document, new Annotator(document));
     }
   }
 
