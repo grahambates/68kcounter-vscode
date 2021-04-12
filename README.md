@@ -22,7 +22,10 @@ Click 'Toggle counts' at the top of a file to enable these. These counts live-up
 Totals cycles and size across a range of lines. Either:
 
 - Select some text with count annotations enabled and the totals will be displayed in the status bar at the bottom of the screen.
-- Call "68kcounter: Count selection" from the command palette with some text selected.
+
+  ![Selection counts](images/selection.png)
+
+- Call `68kcounter: Count selection` from the command palette with some text selected.
 
 ## Requirements
 
