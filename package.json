@@ -13,10 +13,16 @@
     "vscode": "^1.55.0"
   },
   "categories": [
+    "Debuggers",
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:m68k"
+    "onLanguage:m68k",
+    "onLanguage:amiga-assembly-debug.disassembly",
+    "onLanguage:as",
+    "onLanguage:vasmmot",
+    "onLanguage:vasmstd",
+    "onLanguage:codewarrior"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -24,6 +30,10 @@
       {
         "command": "68kcounter.toggleCounts",
         "title": "68kcounter: Toggle counts"
+      },
+      {
+        "command": "68kcounter.countSelection",
+        "title": "68kcounter: Count selection"
       }
     ]
   },

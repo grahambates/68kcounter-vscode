@@ -1,70 +1,31 @@
 # 68k-counter README
 
-This is the README for your extension "68k-counter". After writing up a brief description, we recommend including the following sections.
+Displays cycle and size information for 68000 assembly source. 
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Gutter annotations
 
-For example if there is an image subfolder under your extension project workspace:
+Provides annotations for each line of code to show:
 
-\!\[feature X\]\(images/feature-x.png\)
+- CPU cycles
+- Bus read cycles
+- Bus write cycles
+- Size in words
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Click 'Toggle counts' at the top of a file to enable these. These counts live-update as you edit the code.
+
+### Calculate totals
+
+Totals cycles and size across a range of lines. Either:
+
+- Select some text with count annotations enabled and the totals will be displayed in the status bar at the bottom of the screen.
+- Call "68kcounter: Count selection" from the command palette with some text selected.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+An extension which provides a 68000 assemly language definition:
 
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- [Amiga Assemebly](https://marketplace.visualstudio.com/items?itemName=prb28.amiga-assembly)
+- [m68k](https://marketplace.visualstudio.com/items?itemName=steventattersall.m68k)
+- [Motorola 68k Assembly](https://marketplace.visualstudio.com/items?itemName=clcxce.motorola-68k-assembly)
