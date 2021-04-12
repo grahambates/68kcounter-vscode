@@ -4,7 +4,9 @@
   "description": "68000 ASM source code cycle counter",
   "version": "0.0.1",
   "author": "Graham Bates <hello@grahambates.com>",
+  "publisher": "gigabates",
   "license": "MIT",
+  "homepage": "https://github.com/grahambates/68kcounter-vscode.git",
   "repository": {
     "type": "git",
     "url": "https://github.com/grahambates/68kcounter-vscode.git"
@@ -39,9 +41,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "build": "tsc -p ./",
+    "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run build && npm run lint",
+    "pretest": "npm run compile && npm run lint",
     "lint": "eslint . --ext .ts --ignore-path .gitignore",
     "test": "node ./out/test/runTest.js"
   },
