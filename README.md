@@ -1,10 +1,12 @@
-# 68k-counter README
+# 68k Counter for VS Code
 
-Displays cycle and size information for 68000 assembly source. 
+Displays cycle and size information for 68000 assembly source.
 
 ## Features
 
 ### Gutter annotations
+
+![Output window screenshot](images/demo.gif)
 
 Provides annotations for each line of code to show:
 
@@ -24,7 +26,7 @@ Totals cycles and size across a range of lines. Either:
 
 ## Requirements
 
-An extension which provides a 68000 assemly language definition:
+An extension which provides a 68000 assembly language definition:
 
 - [Amiga Assemebly](https://marketplace.visualstudio.com/items?itemName=prb28.amiga-assembly)
 - [m68k](https://marketplace.visualstudio.com/items?itemName=steventattersall.m68k)
