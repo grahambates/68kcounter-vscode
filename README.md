@@ -10,10 +10,10 @@ Displays cycle and size information for 68000 assembly source.
 
 Provides annotations for each line of code to show:
 
+- Size in words
 - CPU cycles
 - Bus read cycles
 - Bus write cycles
-- Size in words
 
 Click 'Toggle counts' at the top of a file to enable these. These counts live-update as you edit the code.
 
