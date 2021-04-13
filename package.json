@@ -24,6 +24,7 @@
     "onCommand:68kcounter.countSelection",
     "onLanguage:m68k",
     "onLanguage:amiga-assembly-debug.disassembly",
+    "onLanguage:amiga.assembly",
     "onLanguage:amiga.disassembly",
     "onLanguage:as",
     "onLanguage:vasmmot",
@@ -70,6 +71,6 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "68kcounter": "^1.0.5"
+    "68kcounter": "^1.0.6"
   }
 }
