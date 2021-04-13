@@ -129,6 +129,9 @@ export class Annotator implements Disposable {
    * Build an array containing decorations for each line of code
    */
   private buildDecorations(text: string) {
+    // Clean up inline ASM in C
+    text = text.replace(/(\\n|"|%%)/g, "");
+
     return parse(text).map((line) => {
       const { words, timings } = line;
 
