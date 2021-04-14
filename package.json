@@ -2,7 +2,7 @@
   "name": "68kcounter",
   "displayName": "68k Counter",
   "description": "68000 ASM source code cycle counter",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "Graham Bates <hello@grahambates.com>",
   "publisher": "gigabates",
   "license": "MIT",
