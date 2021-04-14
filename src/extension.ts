@@ -42,6 +42,12 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
     languages.registerCodeLensProvider("codewarrior", codeLensProvider)
   );
+  context.subscriptions.push(
+    languages.registerCodeLensProvider("amiga.assembly", codeLensProvider)
+  );
+  context.subscriptions.push(
+    languages.registerCodeLensProvider("amiga.disassembly", codeLensProvider)
+  );
 }
 
 export function deactivate(): void {
