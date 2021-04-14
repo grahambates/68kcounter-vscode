@@ -71,6 +71,6 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "68kcounter": "^1.0.9"
+    "68kcounter": "^1.0.10"
   }
 }
