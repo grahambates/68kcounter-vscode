@@ -48,6 +48,12 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
     languages.registerCodeLensProvider("amiga.disassembly", codeLensProvider)
   );
+  context.subscriptions.push(
+    languages.registerCodeLensProvider(
+      { pattern: "**/*.{s,i,asm}" },
+      codeLensProvider
+    )
+  );
 }
 
 export function deactivate(): void {
