@@ -13,10 +13,13 @@ export default function countSelection(): void {
   const selectedLines = process(source);
 
   const totals = calculateTotals(selectedLines);
-  let text = "Length: " + totals.words;
+  let text = "Bytes: " + totals.bytes;
+  if (totals.bssBytes) {
+    text += ` (${totals.bssBytes} bss)`;
+  }
   text += " Cycles: " + formatTiming(totals.min);
   if (totals.isRange) {
-    text += " " + formatTiming(totals.max);
+    text += "–" + formatTiming(totals.max);
   }
   window.showInformationMessage(text);
 }

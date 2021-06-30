@@ -10,5 +10,6 @@
     "typescript.tsc.autoDetect": "off",
     "cSpell.words": [
         "kcounter"
-    ]
+    ],
+    "C_Cpp.default.compilerPath": "/Users/batesgw1/.vscode/extensions/bartmanabyss.amiga-debug-1.0.0\\bin\\opt\\bin\\m68k-amiga-elf-gcc.exe"
 }

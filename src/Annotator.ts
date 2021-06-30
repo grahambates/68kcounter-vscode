@@ -15,17 +15,19 @@ import {
 import parse, {
   formatTiming,
   Level,
+  Levels,
   timingLevel,
   calculateTotals,
   Line,
+  Timing,
 } from "68kcounter";
 
 const colorPre = new ThemeColor("textPreformat.foreground");
 const colors: Record<Level, ThemeColor | string> = {
-  [Level.VHigh]: "red",
-  [Level.High]: new ThemeColor("editorError.foreground"),
-  [Level.Med]: new ThemeColor("editorWarning.foreground"),
-  [Level.Low]: new ThemeColor("editorInfo.foreground"),
+  [Levels.VHigh]: "#f44",
+  [Levels.High]: new ThemeColor("editorError.foreground"),
+  [Levels.Med]: new ThemeColor("editorWarning.foreground"),
+  [Levels.Low]: new ThemeColor("editorInfo.foreground"),
 };
 
 interface Annotation {
@@ -90,6 +92,7 @@ export class Annotator implements Disposable {
     this.hide();
     this.statusBarItem.dispose();
     this.disposable.dispose();
+    this.type.dispose();
   }
 
   toggle(): void {
@@ -99,10 +102,7 @@ export class Annotator implements Disposable {
   show(): void {
     this.visible = true;
 
-    let text = this.document.getText();
-    text = text.replace(/(\\n|"|%%)/g, "");
-    this.lines = parse(text);
-
+    this.lines = parse(this.document.getText().replace(/\r\n/g, "\n"));
     const annotations = this.lines.map(this.buildAnnotation);
 
     window.activeTextEditor?.setDecorations(
@@ -124,24 +124,21 @@ export class Annotator implements Disposable {
 
   private showTotals() {
     const selection = window.activeTextEditor?.selection;
-    if (selection && selection.start.line !== selection.end.line) {
-      // Selection totals:
-      const selectedLines = this.lines.slice(
-        selection.start.line,
-        selection.end.line + 1
-      );
-      const totals = calculateTotals(selectedLines);
-      let text = "Length: " + totals.words;
-      text += " Cycles: " + formatTiming(totals.min);
-      if (totals.isRange) {
-        text += " " + formatTiming(totals.max);
-      }
-      this.statusBarItem.text = text;
-    } else {
-      // File totals:
-      const totals = calculateTotals(this.lines);
-      this.statusBarItem.text = "Length: " + totals.words;
+    const lines =
+      selection && selection.start.line !== selection.end.line
+        ? this.lines.slice(selection.start.line, selection.end.line + 1)
+        : this.lines;
+
+    const totals = calculateTotals(lines);
+    let text = "Bytes: " + totals.bytes;
+    if (totals.bssBytes) {
+      text += ` (${totals.bssBytes} bss)`;
     }
+    text += " | Cycles: " + formatTiming(totals.min);
+    if (totals.isRange) {
+      text += "–" + formatTiming(totals.max);
+    }
+    this.statusBarItem.text = text;
     this.statusBarItem.show();
   }
 
@@ -149,27 +146,47 @@ export class Annotator implements Disposable {
    * Get annotation text and color for a line of code
    */
   private buildAnnotation(line: Line): Annotation {
-    const { words, timings } = line;
-
+    const { bytes, timing } = line;
     let text = "";
     let color = colorPre;
-    if (timings) {
-      if (Array.isArray(timings)) {
-        text += timings.map(formatTiming).join(" ");
-      } else {
-        text += formatTiming(timings);
-      }
-      if (timings) {
-        const level = timingLevel(
-          Array.isArray(timings) ? timings[0] : timings
+    if (timing) {
+      text += timing.values.map(formatTiming).join(" ");
+      const level = timingLevel(timing.values[0]);
+      color = colors[level];
+    }
+    if (bytes) {
+      text += " " + bytes;
+    }
+
+    const infoLines: string[] = [];
+    if (line.timing && line.timing.values.length > 1) {
+      infoLines.push(line.timing.labels.join(" / "));
+    }
+    const calculation = line.timing?.calculation;
+    if (calculation) {
+      if (
+        calculation.multiplier ||
+        (calculation?.ea && calculation.ea[0] > 0)
+      ) {
+        let calc = formatCalculation(
+          calculation.base[0],
+          calculation.multiplier
         );
-        color = colors[level];
+        if (calculation?.ea && calculation.ea[0] > 0) {
+          calc += ` + EA: ${formatTiming(calculation.ea)}`;
+        }
+        infoLines.push(calc);
+      }
+      if (calculation?.n) {
+        infoLines.push(`n = ${calculation.n}`);
       }
     }
-    if (words) {
-      text += " " + words;
-    }
-    const hoverMessage = "";
+
+    const hoverMessage =
+      infoLines.length > 1
+        ? infoLines.map((s) => " * " + s).join("\n")
+        : infoLines.join("\n");
+
     return { text, color, hoverMessage };
   }
 
@@ -182,6 +199,8 @@ export class Annotator implements Disposable {
   private onChangeEditor(e?: TextEditor) {
     if (this.visible && e?.document === this.document) {
       this.show();
+    } else {
+      this.statusBarItem.hide();
     }
   }
 
@@ -193,3 +212,17 @@ export class Annotator implements Disposable {
     }
   }
 }
+
+const formatCalculation = (timing: Timing, multiplier?: Timing) => {
+  const strVals = timing.map((v) => String(v));
+
+  if (multiplier) {
+    for (const i in multiplier) {
+      if (multiplier[i]) {
+        strVals[i] += "+" + multiplier[i] + "n";
+      }
+    }
+  }
+
+  return `${strVals[0]}(${strVals[1]}/${strVals[2]})`;
+};
