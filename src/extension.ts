@@ -22,33 +22,6 @@ export function activate(context: ExtensionContext): void {
   const codeLensProvider = new AnnotateCodeLensProvider();
 
   context.subscriptions.push(
-    languages.registerCodeLensProvider("m68k", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider(
-      "amiga-assembly-debug.disassembly",
-      codeLensProvider
-    )
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("as", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("vasmmot", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("vasmstd", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("codewarrior", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("amiga.assembly", codeLensProvider)
-  );
-  context.subscriptions.push(
-    languages.registerCodeLensProvider("amiga.disassembly", codeLensProvider)
-  );
-  context.subscriptions.push(
     languages.registerCodeLensProvider(
       { pattern: "**/*.{s,i,asm}" },
       codeLensProvider
