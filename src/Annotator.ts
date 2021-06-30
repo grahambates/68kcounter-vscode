@@ -5,7 +5,6 @@ import {
   StatusBarItem,
   TextDocument,
   TextDocumentChangeEvent,
-  TextDocumentContentChangeEvent,
   TextEditor,
   TextEditorDecorationType,
   TextEditorSelectionChangeEvent,
@@ -21,10 +20,7 @@ import parse, {
   Line,
 } from "68kcounter";
 
-type LineDecoration = { line: Line; decorationType: TextEditorDecorationType };
-
 const colorPre = new ThemeColor("textPreformat.foreground");
-const width = "210px";
 const colors: Record<Level, ThemeColor | string> = {
   [Level.VHigh]: "red",
   [Level.High]: new ThemeColor("editorError.foreground"),
@@ -32,16 +28,45 @@ const colors: Record<Level, ThemeColor | string> = {
   [Level.Low]: new ThemeColor("editorInfo.foreground"),
 };
 
+interface Annotation {
+  text: string;
+  hoverMessage: string;
+  color: ThemeColor;
+}
+
 /**
  * Manages timing annotations for an editor instance
  */
 export class Annotator implements Disposable {
   private document: TextDocument;
-  private lineDecorations: LineDecoration[] | null = null;
+  private lines: Line[] = [];
   private statusBarItem: StatusBarItem;
   private disposable: Disposable;
+  private visible = false;
+  private type: TextEditorDecorationType;
 
   constructor(document: TextDocument) {
+    this.type = window.createTextEditorDecorationType({
+      light: {
+        before: {
+          backgroundColor: "rgba(0, 0, 0, .02)",
+        },
+      },
+      dark: {
+        before: {
+          backgroundColor: "rgba(255, 255, 255,.02)",
+        },
+      },
+      before: {
+        width: "210px",
+        borderColor: new ThemeColor("editorInfo.foreground"),
+        textDecoration: `;border-width: 0 2px 0 0; border-style: solid; margin-right: 26px; padding: 0 6px; text-align: right;`,
+      },
+      after: {
+        contentText: " ",
+      },
+    });
+
     this.document = document;
     const subscriptions: Disposable[] = [];
     workspace.onDidChangeTextDocument(this.onChange, this, subscriptions);
@@ -68,159 +93,103 @@ export class Annotator implements Disposable {
   }
 
   toggle(): void {
-    this.isVisible() ? this.hide() : this.show();
+    this.visible ? this.hide() : this.show();
   }
 
   show(): void {
-    this.lineDecorations = this.buildDecorations(this.document.getText());
-    this.lineDecorations?.forEach(({ decorationType }, i) => {
-      window.activeTextEditor?.setDecorations(decorationType, [
-        new Range(i, 0, i, 0),
-      ]);
-    });
+    this.visible = true;
+
+    let text = this.document.getText();
+    text = text.replace(/(\\n|"|%%)/g, "");
+    this.lines = parse(text);
+
+    const annotations = this.lines.map(this.buildAnnotation);
+
+    window.activeTextEditor?.setDecorations(
+      this.type,
+      annotations.map(({ text, color, hoverMessage }, i) => ({
+        range: new Range(i, 0, i, 0),
+        hoverMessage,
+        renderOptions: { before: { contentText: text || " ", color } },
+      }))
+    );
     this.showTotals();
   }
 
   hide(): void {
-    if (this.isVisible()) {
-      this.lineDecorations?.forEach(({ decorationType }) =>
-        decorationType.dispose()
-      );
-    }
-    this.lineDecorations = null;
-    this.hideTotals();
-  }
-
-  isVisible(): boolean {
-    return this.lineDecorations !== null;
-  }
-
-  private showTotals() {
-    if (this.lineDecorations) {
-      const selection = window.activeTextEditor?.selection;
-      if (selection && selection.start.line !== selection.end.line) {
-        // Selection totals:
-        const selectedLines = this.lineDecorations
-          .slice(selection.start.line, selection.end.line + 1)
-          .map((n) => n.line);
-        const totals = calculateTotals(selectedLines);
-        let text = "Length: " + totals.words;
-        text += " Cycles: " + formatTiming(totals.min);
-        if (totals.isRange) {
-          text += " " + formatTiming(totals.max);
-        }
-        this.statusBarItem.text = text;
-      } else {
-        // File totals:
-        const totals = calculateTotals(
-          this.lineDecorations?.map((n) => n.line)
-        );
-        this.statusBarItem.text = "Length: " + totals.words;
-      }
-      this.statusBarItem.show();
-    }
-  }
-
-  private hideTotals() {
+    this.visible = false;
+    window.activeTextEditor?.setDecorations(this.type, []);
     this.statusBarItem.hide();
   }
 
+  private showTotals() {
+    const selection = window.activeTextEditor?.selection;
+    if (selection && selection.start.line !== selection.end.line) {
+      // Selection totals:
+      const selectedLines = this.lines.slice(
+        selection.start.line,
+        selection.end.line + 1
+      );
+      const totals = calculateTotals(selectedLines);
+      let text = "Length: " + totals.words;
+      text += " Cycles: " + formatTiming(totals.min);
+      if (totals.isRange) {
+        text += " " + formatTiming(totals.max);
+      }
+      this.statusBarItem.text = text;
+    } else {
+      // File totals:
+      const totals = calculateTotals(this.lines);
+      this.statusBarItem.text = "Length: " + totals.words;
+    }
+    this.statusBarItem.show();
+  }
+
   /**
-   * Build an array containing decorations for each line of code
+   * Get annotation text and color for a line of code
    */
-  private buildDecorations(text: string) {
-    // Clean up inline ASM in C
-    text = text.replace(/(\\n|"|%%)/g, "");
+  private buildAnnotation(line: Line): Annotation {
+    const { words, timings } = line;
 
-    return parse(text).map((line) => {
-      const { words, timings } = line;
-
-      let contentText = "";
-      let color = colorPre;
-      if (words) {
-        contentText += words + " ";
+    let text = "";
+    let color = colorPre;
+    if (timings) {
+      if (Array.isArray(timings)) {
+        text += timings.map(formatTiming).join(" ");
+      } else {
+        text += formatTiming(timings);
       }
       if (timings) {
-        if (Array.isArray(timings)) {
-          contentText += timings.map(formatTiming).join(" ");
-        } else {
-          contentText += formatTiming(timings);
-        }
         const level = timingLevel(
           Array.isArray(timings) ? timings[0] : timings
         );
         color = colors[level];
       }
-
-      const decorationType = window.createTextEditorDecorationType({
-        before: {
-          contentText,
-          color,
-          width,
-        },
-      });
-
-      return { decorationType, line };
-    });
+    }
+    if (words) {
+      text += " " + words;
+    }
+    const hoverMessage = "";
+    return { text, color, hoverMessage };
   }
 
   private onSelection(e: TextEditorSelectionChangeEvent) {
-    if (this.isVisible() && e.textEditor.document === this.document) {
+    if (this.visible && e.textEditor.document === this.document) {
       this.showTotals();
     }
   }
 
   private onChangeEditor(e?: TextEditor) {
-    if (this.isVisible()) {
-      if (e?.document === this.document) {
-        this.show();
-      } else {
-        this.hideTotals();
-      }
+    if (this.visible && e?.document === this.document) {
+      this.show();
     }
   }
 
   private onChange(e: TextDocumentChangeEvent) {
-    if (this.isVisible() && e.document === this.document) {
-      e.contentChanges.forEach((c) => this.onContentChange(c));
-      this.showTotals();
+    if (this.visible && e.document === this.document) {
+      if (this.visible) {
+        this.show();
+      }
     }
-  }
-
-  private onContentChange(change: TextDocumentContentChangeEvent) {
-    if (!this.lineDecorations) {
-      return;
-    }
-
-    const { range, text } = change;
-    const sourceLineCount = range.end.line - range.start.line + 1;
-    const newLines = text.split("\n").length;
-    const changedLinesText = this.document
-      .getText(new Range(range.start.line, 0, range.start.line + newLines, 0))
-      .slice(0, -1);
-
-    // Remove old decorations in range
-    const oldDecorations = this.lineDecorations.slice(
-      range.start.line,
-      range.end.line + 1
-    );
-    oldDecorations.forEach(({ decorationType }) => decorationType.dispose());
-
-    const newDecorations = this.buildDecorations(changedLinesText);
-
-    // Apply new decorations
-    newDecorations.forEach(({ decorationType }, i) => {
-      const l = i + range.start.line;
-      window.activeTextEditor?.setDecorations(decorationType, [
-        new Range(l, 0, l, 0),
-      ]);
-    });
-
-    // Splice new decorations into list
-    this.lineDecorations.splice(
-      range.start.line,
-      sourceLineCount,
-      ...newDecorations
-    );
   }
 }
