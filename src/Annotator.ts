@@ -21,6 +21,7 @@ import parse, {
   Line,
   Timing,
 } from "68kcounter";
+import debounce from "debounce";
 
 const colorPre = new ThemeColor("textPreformat.foreground");
 const colors: Record<Level, ThemeColor | string> = {
@@ -71,7 +72,11 @@ export class Annotator implements Disposable {
 
     this.document = document;
     const subscriptions: Disposable[] = [];
-    workspace.onDidChangeTextDocument(this.onChange, this, subscriptions);
+    workspace.onDidChangeTextDocument(
+      debounce(this.onChange, 100, true),
+      this,
+      subscriptions
+    );
     window.onDidChangeTextEditorSelection(
       this.onSelection,
       this,
@@ -102,7 +107,7 @@ export class Annotator implements Disposable {
   show(): void {
     this.visible = true;
 
-    this.lines = parse(this.document.getText().replace(/\r\n/g, "\n"));
+    this.lines = parse(this.document.getText());
     const annotations = this.lines.map(this.buildAnnotation);
 
     window.activeTextEditor?.setDecorations(
@@ -206,9 +211,7 @@ export class Annotator implements Disposable {
 
   private onChange(e: TextDocumentChangeEvent) {
     if (this.visible && e.document === this.document) {
-      if (this.visible) {
-        this.show();
-      }
+      this.show();
     }
   }
 }

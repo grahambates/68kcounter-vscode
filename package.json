@@ -45,6 +45,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@types/debounce": "^1.2.0",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
@@ -63,6 +64,7 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "68kcounter": "^3.1.0"
+    "68kcounter": "^3.1.1",
+    "debounce": "^1.2.1"
   }
 }

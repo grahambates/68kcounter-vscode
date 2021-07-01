@@ -27,3 +27,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Issues switching between editors
 - Inaccurate timings
 - Missing instructions
+
+## [1.1.1]
+
+### Fixed
+
+- Debounce updates for improved performance
+- Handle single quoted strings
