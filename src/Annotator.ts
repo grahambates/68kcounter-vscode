@@ -65,9 +65,6 @@ export class Annotator implements Disposable {
         borderColor: new ThemeColor("editorInfo.foreground"),
         textDecoration: `;border-width: 0 2px 0 0; border-style: solid; margin-right: 26px; padding: 0 6px; text-align: right;`,
       },
-      after: {
-        contentText: " ",
-      },
     });
 
     this.document = document;
