@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.1.2] - 2021-07-05
+
+### Fixed
+
+- Remove 'after' decorator which was affecting cursor position
+
 ## [1.1.1] - 2021-06-30
 
 ### Fixed
