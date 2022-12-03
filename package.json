@@ -20,7 +20,9 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:m68k",
+    "onLanguage:vasmmot",
+    "workspaceContains:**/*.{s,S,asm,ASM}"
   ],
   "main": "./out/extension.js",
   "contributes": {
