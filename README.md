@@ -1,3 +1,7 @@
+> **This repository has moved.** Development continues in [grahambates/m68k-tools](https://github.com/grahambates/m68k-tools), under [`apps/68kcounter-vscode`](https://github.com/grahambates/m68k-tools/tree/main/apps/68kcounter-vscode). This repository is archived; please file issues and pull requests there instead.
+
+---
+
 # 68k Counter for VS Code
 
 Displays cycle and size information for 68000 assembly source.
